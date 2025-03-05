@@ -1,0 +1,19 @@
+# Ignorar la carpeta de imágenes locales
+assets/
+
+# Ignorar archivos de configuración sensibles
+.env
+
+# Ignorar dependencias generadas
+node_modules/
+
+# Ignorar archivos de logs
+npm-debug.log
+yarn-error.log
+
+# Ignorar cachés del editor
+.vscode/
+.idea/
+
+# Ignorar datos generados
+data/images-cloudinary.json
