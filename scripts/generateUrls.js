@@ -29,7 +29,14 @@ const fetchCloudinaryImages = async () => {
       if (!imagesByProject[project]) {
         imagesByProject[project] = [];
       }
-      imagesByProject[project].push(image.secure_url);
+
+      // Modificar la URL para optimización
+      const optimizedUrl = image.secure_url.replace(
+        "/upload/",
+        "/upload/f_auto,q_auto/"
+      );
+
+      imagesByProject[project].push(optimizedUrl);
     });
 
     await fs.outputJson(OUTPUT_FILE, imagesByProject, { spaces: 2 });
