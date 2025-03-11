@@ -13,10 +13,9 @@ cloudinary.config({
 // Ruta de la carpeta local con imágenes
 const ASSETS_DIR = path.join(__dirname, "../assets");
 
-// Función para subir imágenes a Cloudinary
 const uploadImages = async () => {
   if (!fs.existsSync(ASSETS_DIR)) {
-    console.log("❌ La carpeta 'assets-portfolio/' no existe.");
+    console.log("❌ La carpeta 'assets/' no existe.");
     return;
   }
 
@@ -31,30 +30,37 @@ const uploadImages = async () => {
 
     for (const image of images) {
       const imagePath = path.join(projectPath, image);
-      const imageName = path.parse(image).name; // Evita que el nombre tenga doble extensión
+      const imageName = path.parse(image).name; // Evita doble extensión
+      const extension = path.extname(image); // Obtener extensión original
       const cloudinaryPath = `assets-portfolio/${project}/${imageName}`;
 
       try {
         // Verificar si la imagen ya existe en Cloudinary
-        const exists = await cloudinary.api.resource(cloudinaryPath).catch(() => null);
-        if (exists) {
+        const exists = await cloudinary.search
+          .expression(`public_id="${cloudinaryPath}"`)
+          .execute();
+
+        if (exists.total_count > 0) {
           console.log(`✅ ${cloudinaryPath} ya está en Cloudinary. Omitiendo...`);
           continue;
         }
 
-        // Subir imagen a Cloudinary
+        // Subir imagen con optimización (sin `format: "auto"`)
         const result = await cloudinary.uploader.upload(imagePath, {
           public_id: cloudinaryPath,
           folder: `assets-portfolio/${project}`,
+          quality: "auto:low", // Reduce la calidad sin perder mucha nitidez
+          overwrite: false, // No sobrescribe archivos existentes
         });
 
-        console.log(`⬆️ Subida: ${result.secure_url}`);
+        console.log(`⬆️ Subida optimizada: ${result.secure_url}`);
       } catch (error) {
         console.error(`⚠️ Error al subir ${image}:`, error.message);
       }
     }
   }
-  console.log("🎉 ¡Proceso de subida completado!");
+  console.log("🎉 ¡Proceso de subida optimizada completado!");
 };
 
+// Ejecutar script
 uploadImages();
